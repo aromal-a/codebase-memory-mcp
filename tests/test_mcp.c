@@ -144,6 +144,7 @@ TEST(mcp_initialize_response) {
     ASSERT_NOT_NULL(strstr(json, "codebase-memory-mcp"));
     ASSERT_NOT_NULL(strstr(json, "capabilities"));
     ASSERT_NOT_NULL(strstr(json, "tools"));
+    ASSERT_NOT_NULL(strstr(json, "\"listChanged\":false"));
     ASSERT_NOT_NULL(strstr(json, "2025-11-25"));
     free(json);
 
@@ -188,6 +189,15 @@ TEST(mcp_tools_list) {
     PASS();
 }
 
+TEST(mcp_tools_list_latest_metadata) {
+    char *json = cbm_mcp_tools_list();
+    ASSERT_NOT_NULL(json);
+    ASSERT_NOT_NULL(strstr(json, "\"title\":\"Search graph\""));
+    ASSERT_NOT_NULL(strstr(json, "\"title\":\"Index repository\""));
+    free(json);
+    PASS();
+}
+
 TEST(mcp_tools_array_schemas_have_items) {
     /* VS Code 1.112+ rejects array schemas without "items" (see
      * https://github.com/microsoft/vscode/issues/248810).
@@ -223,8 +233,29 @@ TEST(mcp_text_result) {
     ASSERT_NOT_NULL(strstr(json, "\"type\":\"text\""));
     /* The text value is JSON-escaped inside the "text" field */
     ASSERT_NOT_NULL(strstr(json, "total"));
+    ASSERT_NOT_NULL(strstr(json, "\"structuredContent\":{\"total\":5}"));
+    ASSERT_NOT_NULL(strstr(json, "\"isError\":false"));
     ASSERT_NULL(strstr(json, "\"isError\":true"));
     free(json);
+    PASS();
+}
+
+TEST(mcp_text_result_skips_structured_content_for_plain_text) {
+    char *json = cbm_mcp_text_result("plain text", false);
+    ASSERT_NOT_NULL(json);
+    ASSERT_NULL(strstr(json, "\"structuredContent\""));
+    ASSERT_NOT_NULL(strstr(json, "\"isError\":false"));
+    free(json);
+    PASS();
+}
+
+TEST(mcp_cancel_matches_request_id) {
+    ASSERT_TRUE(cbm_mcp_cancel_request_matches("{\"requestId\":7}", 7, NULL));
+    ASSERT_FALSE(cbm_mcp_cancel_request_matches("{\"requestId\":8}", 7, NULL));
+    ASSERT_TRUE(cbm_mcp_cancel_request_matches("{\"requestId\":\"call-1\"}", -1, "call-1"));
+    ASSERT_FALSE(cbm_mcp_cancel_request_matches("{\"requestId\":\"call-2\"}", -1, "call-1"));
+    ASSERT_FALSE(cbm_mcp_cancel_request_matches("{\"requestId\":7}", -1, "7"));
+    ASSERT_FALSE(cbm_mcp_cancel_request_matches("{}", 7, NULL));
     PASS();
 }
 
@@ -1156,7 +1187,7 @@ TEST(tool_manage_adr_get_with_existing_adr) {
     /* ADR content must appear in response */
     ASSERT_NOT_NULL(strstr(resp, "PURPOSE"));
     /* Must not be an error */
-    ASSERT_NULL(strstr(resp, "isError"));
+    ASSERT_NULL(strstr(resp, "\"isError\":true"));
     free(resp);
 
     /* Clean up */
@@ -1202,7 +1233,7 @@ TEST(tool_manage_adr_unified_backend_issue256) {
              "\"mode\":\"get\"}}}");
     ASSERT_NOT_NULL(resp);
     ASSERT_NOT_NULL(strstr(resp, "Unified ADR backend."));
-    ASSERT_NULL(strstr(resp, "isError"));
+    ASSERT_NULL(strstr(resp, "\"isError\":true"));
     free(resp);
 
     cbm_mcp_server_free(srv);
@@ -2324,8 +2355,11 @@ SUITE(mcp) {
     /* MCP protocol helpers */
     RUN_TEST(mcp_initialize_response);
     RUN_TEST(mcp_tools_list);
+    RUN_TEST(mcp_tools_list_latest_metadata);
     RUN_TEST(mcp_tools_array_schemas_have_items);
     RUN_TEST(mcp_text_result);
+    RUN_TEST(mcp_text_result_skips_structured_content_for_plain_text);
+    RUN_TEST(mcp_cancel_matches_request_id);
     RUN_TEST(mcp_text_result_error);
 
     /* Argument extraction */
