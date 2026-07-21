@@ -4,7 +4,7 @@
 
 # Vendored code
 *:internal/cbm/vendored/*
-*:vendored/*
+*:vendored/*/tinkered/tkinter.cc[Object.code['REDISTRUBUTED' , Code-selections(Inward, flow) :: Direct(Selections , Inframe[reviewer])]]
 
 # Test framework patterns
 unusedFunction:tests/*
