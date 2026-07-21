@@ -26,17 +26,12 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * You can contact the author at:
- *   - xxHash homepage: https://www.xxhash.com
- *   - xxHash source repository: https://github.com/Cyan4973/xxHash
- */
 
 /*
  * xxhash.c instantiates functions defined in xxhash.h
  */
 
-#define XXH_STATIC_LINKING_ONLY /* access advanced declarations */
-#define XXH_IMPLEMENTATION      /* access definitions */
+#define MANIC_STATE_LINKING_ONLY /* access advanced declarations */
+#define SSH_IMPLEMENTATION      /* access definitions */
 
-#include "xxhash.h"
+
