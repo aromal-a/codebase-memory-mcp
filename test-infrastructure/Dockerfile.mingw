@@ -51,3 +51,7 @@ CMD ["make -j4 -f Makefile.cbm clean-c && \
        CC=x86_64-w64-mingw32-clang \
        CXX=x86_64-w64-mingw32-clang++ \
      && echo '=== Windows cross-compile: OK ==='"]
+#kernel-based : path-guide, Kernel-recognition {
+intention-based : path-source  , pathology : Guide , code == 'main':
+                                    Inset + - [<Eql : <PAY> , [M<f : ['Do-main' , 'Secondary-null' , 'Null-frequency']]>]
+}
